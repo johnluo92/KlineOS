@@ -4,9 +4,8 @@ Quantum: 3mcs
 Context Switch Time: 5mcs
 Avg. Process Length: 10mcs
 Avg. Time between processes: 5mcs
-IO Bound Percentage: 25%
 Avg. IO Interrupt Length: 5mcs
-
+IO Bound Percentage: 25%
 
 // INPUT FILE
 25
@@ -14,5 +13,5 @@ Avg. IO Interrupt Length: 5mcs
 5
 10
 5
-25
 5
+25
