@@ -1,0 +1,18 @@
+// INPUT FILE
+Simulation Time: 25s
+Quantum: 3mcs
+Context Switch Time: 5mcs
+Avg. Process Length: 10mcs
+Avg. Time between processes: 5mcs
+IO Bound Percentage: 25%
+Avg. IO Interrupt Length: 5mcs
+
+
+// INPUT FILE
+25
+3
+5
+10
+5
+25
+5
