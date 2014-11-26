@@ -1,10 +1,11 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
-
+import java.util.ArrayList;
 
 public class Main {
 
+<<<<<<< HEAD
 	// Values in Microseconds
 			int simulationTime=0; // 
 			int quantum=0; //
@@ -15,6 +16,25 @@ public class Main {
 			
 			// Decimal representing percentage
 			float ioBoundPercentage=0;
+=======
+	// Process Ready Queue
+	ArrayList<Process> readyQ = new ArrayList<Process>();
+	// Event Queue
+	// CPU 'Queue' (holds only one process)
+			
+	//Values in seconds
+	int simulationTime=0;
+			
+	// Values in Microseconds
+	int quantum=0; //
+	int contextSwitchTime=0;
+	int avgProcessLength=0;
+	int avgTimeBetweenProcesses=0;
+	int avgIOInterruptLength=0;
+			
+	// Decimal representing percentage
+	float ioBoundPercentage=0;
+>>>>>>> e811bd02e9d35fb3c181f2508464cfca2b8bdf80
 	
 	public static void main(String[] args) {
 		
@@ -40,9 +60,8 @@ public class Main {
 				input = Integer.parseInt(line);
 			}
 			if (count == 1) {
-				// Convert to MicroSeconds
 				System.out.println("Simulation Time: " + input);
-				simulationTime =  input * 1000 * 1000;
+				simulationTime =  input;
 			} else if (count == 2) {
 				System.out.println("Quantum is: " + input);
 				quantum = input;
@@ -69,10 +88,23 @@ public class Main {
 		//
 	}
 	
+<<<<<<< HEAD
 	void createProcess(){
 		Process process = new Process(5);
 		
 	}
 	
+=======
+	// Faux Event. Process Instance calls this method when it's done
+	public void processDone() {
+		// Remove current process from Queue and Nullify it
+		// Reset Quantum if necessary
+		// Switch Process
+	}
+	
+	public void flow() {
+		
+	}
+>>>>>>> e811bd02e9d35fb3c181f2508464cfca2b8bdf80
 
 }
