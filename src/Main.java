@@ -5,18 +5,20 @@ import java.util.Scanner;
 
 public class Main {
 
+	// Values in Microseconds
+			int simulationTime=0; // 
+			int quantum=0; //
+			int contextSwitchTime=0;
+			int avgProcessLength=0;
+			int avgTimeBetweenProcesses=0;
+			int avgIOInterruptLength=0;
+			
+			// Decimal representing percentage
+			float ioBoundPercentage=0;
+	
 	public static void main(String[] args) {
 		
-		// Values in Microseconds
-		int simulationTime=0; // 
-		int quantum=0; //
-		int contextSwitchTime=0;
-		int avgProcessLength=0;
-		int avgTimeBetweenProcesses=0;
-		int avgIOInterruptLength=0;
 		
-		// Decimal representing percentage
-		float ioBoundPercentage=0;
 		
 		// Parse Input File
 		File file = new File("input.txt");
@@ -66,5 +68,11 @@ public class Main {
 		
 		//
 	}
+	
+	void createProcess(){
+		Process process = new Process(5);
+		
+	}
+	
 
 }
