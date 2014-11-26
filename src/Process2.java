@@ -36,7 +36,6 @@ queue[number] = new Process[pnumber, burst, start];
 	int CPU = RandomGenerator.nextInt(20000) + 10000;
 	int IOPercent = RandomGenerator.nextInt(100);
 		
-	
 	if (IOPercent <= 25)
 	{
 		int process = IO;
