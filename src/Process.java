@@ -4,14 +4,14 @@ import java.util.Random;
 public class Process {
 	
 	public int id;
-	public int startTime, endTime;
-	public int waitingTime, turnaroundTime;
-	public int totalLength = 100;
-	public int remainingTime = totalLength;
+	public long startTime, endTime;
+	public long waitingTime, turnaroundTime;
+	public long totalLength = 100;
+	public long remainingTime = totalLength;
 	public boolean iobound = false;
 	
 	
-	public Process(int tm, int identification,float iochance) {
+	public Process(long tm, int identification,float iochance,int length) {
 		startTime = tm;
 		id = identification;
 		
@@ -22,9 +22,14 @@ public class Process {
 			iobound = true;
 		}
 		
+		// Random Length
+		totalLength = Generator.randomRange(length);
+		remainingTime = totalLength;
+		
+		
 	}
 	
-	public void done(int end) {
+	public void done(long end) {
 		endTime = end;
 		turnaroundTime = endTime - startTime;
 		waitingTime = turnaroundTime - totalLength;

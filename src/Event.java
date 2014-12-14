@@ -1,9 +1,10 @@
 
 public class Event implements Comparable<Event> {
 
-	public int type, timestamp;
+	public int type;
+	public long timestamp;
 	
-	public Event(int inputtype,int inputtime) {
+	public Event(int inputtype,long inputtime) {
 		type = inputtype;
 		timestamp = inputtime;
 	}

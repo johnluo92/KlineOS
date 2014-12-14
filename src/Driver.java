@@ -7,27 +7,28 @@ import java.util.Scanner;
 public class Driver {
 
 	// INPUT VALUES
-	static int simulationTime = 10000;
+	static long simulationTime = 10000; // Seconds
 	static int quantum=100; 
 	static int contextSwitchTime=0;
 	static int avgProcessLength=0;
 	static int avgTimeBetweenProcesses=0;
-	static int avgIOInterruptLength=0;
-			
-	// Decimal representing percentage
+	static int avgIOServiceTime=0;
 	static int ioBoundPercentage=0;
 	
+	// Q's
 	static ArrayList<Event> eventQ = new ArrayList<Event>();
 	static ArrayList<Process> readyQ = new ArrayList<Process>();
 	static ArrayList<Process> CPU = new ArrayList<Process>();
 	static ArrayList<Process> ioQ = new ArrayList<Process>();
 	static ArrayList<Process> io = new ArrayList<Process>();
 	
-	static int clock = 0;
+	static long clock = 0;
 	
-	static int lastClock = 0;
-	static int avgTurnaround = 0,avgWaiting = 0,doneCount = 0;
-	static float cpuUtilization = 0;
+	static long lastClock = 0;
+	static int avgTurnaround = 0,avgWaiting = 0,doneCount = 0,totalContextSwitch=0;
+	static long cpuUtilization = 0;
+	
+	static int gc = 0;
 	
 	static int lastID = 0;
 	
@@ -35,7 +36,7 @@ public class Driver {
 		//Read Input Parameters
 		readInput();
 		
-		System.out.println("SIMULATION\n");
+		//System.out.println("SIMULATION\n");
 		// Create a Process
 		Event createevent = new Event(0,clock);
 		
@@ -45,9 +46,9 @@ public class Driver {
 		// Run CPu Process
 		Event startevent = new Event(4,clock);
 		eventQ.add(createevent);
-		eventQ.add(createevent);
+		//eventQ.add(createevent);
 		eventQ.add(movetoCPUevent);
-		eventQ.add(startevent);
+		//eventQ.add(startevent);
 		doEvent();
 		
 	}
@@ -80,7 +81,7 @@ public class Driver {
 			}
 			if (count == 1) {
 				System.out.println("Simulation Time: " + input);
-				simulationTime =  input;
+				simulationTime = input * 1000 * 1000;
 			} else if (count == 2) {
 				System.out.println("Quantum is: " + input);
 				quantum = input;
@@ -98,7 +99,7 @@ public class Driver {
 				ioBoundPercentage = input;
 			} else if (count == 7) {
 				System.out.println("Avg IO Interrupt: " + input);
-				avgIOInterruptLength = input;
+				avgIOServiceTime = input;
 			}
 			
 			count++;
@@ -109,7 +110,27 @@ public class Driver {
 	public static void doEvent() {
 		Collections.sort(eventQ);
 		
-		if (eventQ.size() == 0 || clock >= simulationTime) {
+		boolean done = false;
+		Event event = new Event(0,0);
+		
+		if (eventQ.size() == 0) {
+			done = true;
+		} else {
+			event = eventQ.remove(0);
+		}
+		
+		//System.out.println("Event Type:  " + event.type);
+		
+		// Advance Clock to next event
+		if (clock < event.timestamp) {
+			clock = event.timestamp;
+		}
+		
+		if (clock >= simulationTime) {
+			done = true;
+		}
+		
+		if (done) {
 			//Simulation is done
 			clock = simulationTime;
 			report();
@@ -122,14 +143,11 @@ public class Driver {
 			return;
 		}
 		
-//		if (eventQ.size() == 0) {
-//			return;
-//		}
 		
-		Event event = eventQ.remove(0);
 		
-		//System.out.println(eventQ.size());
-		//System.out.println("Event type: " + event.type + ", Event stamp: " + event.timestamp);
+		
+		////System.out.println(eventQ.size());
+		////System.out.println("Event type: " + event.type + ", Event stamp: " + event.timestamp);
 		
 		switch (event.type) {
 		
@@ -139,18 +157,19 @@ public class Driver {
 		break;
 		// Move ready process to CPU
 		case 1:
-			//System.out.println("Moving to CPU");
-			//System.out.print("\ncase: 1");
+			////System.out.println("Moving to CPU");
+			////System.out.print("\ncase: 1");
 			if (readyQ.size() == 0) {
 				break;
 			}
 			CPU.add(readyQ.remove(0));
+			//System.out.println("SIZE OF CPU:   " + CPU.size());
 			System.out.println("Moved process #" + CPU.get(0).id + " to CPU" + "\t\t\t\t at time " + clock);
 		break;
 		
 		// Quantum Switch
 		case 2:
-			//System.out.println("\ncase: 2 (Quantum Switch)");
+			////System.out.println("\ncase: 2 (Quantum Switch)");
 			
 //				if (avgCPUTime > 0) {
 //					avgCPUTime += clock - lastClock;
@@ -168,12 +187,13 @@ public class Driver {
 				
 				
 				
-				//System.out.println("Switching Processes");
-				//System.out.println("event stamp is: " + event.timestamp);
+				System.out.println("Switching Processes");
+				////System.out.println("event stamp is: " + event.timestamp);
 				Event moveback = new Event(3,clock);
 				Event movetoCPU = new Event(1,clock);
 				
 				clock += contextSwitchTime; // Context Switch Time
+				totalContextSwitch += contextSwitchTime;
 				
 				Event run = new Event(4,clock);
 				eventQ.add(moveback);
@@ -184,9 +204,9 @@ public class Driver {
 		
 		// Move from CPU to readyQ
 		case 3: 
-			//System.out.println("Emptying CPU");
+			////System.out.println("Emptying CPU");
 			if (CPU.size() == 0) {
-				//System.out.println("Empty CPU");
+				////System.out.println("Empty CPU");
 				break;
 			}
 			System.out.println("Moving process #" + CPU.get(0).id + " from CPU back to Ready Queue" + "\t\t\t\t at time " + clock);
@@ -196,14 +216,14 @@ public class Driver {
 		
 		// Actually run process
 		case 4:
-			//System.out.print("\ncase: 4");
+			////System.out.print("\ncase: 4");
 			
 			System.out.println("Running process #" + CPU.get(0).id + "\t\t\t\t at time " + clock);
 			runProcess();
 			
 		break;
 		case 5:
-			//System.out.println("\ncase: 5");
+			////System.out.println("\ncase: 5");
 			//Process Done
 			System.out.println("Process #" + CPU.get(0).id +  " done" + "\t\t\t\t at time " + clock);
 			System.out.println("Process #" + CPU.get(0).id +  " Removed from CPU" + "\t\t\t\t at time " + clock);
@@ -214,15 +234,38 @@ public class Driver {
 			
 		break;
 		}
+		
+//		Thread.currentThread();
+//		try {
+//			//Thread.sleep(1);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
+//		if (clock > 10000 * gc) {
+////			Thread.currentThread();
+////			try {
+////				Thread.sleep(10);
+////			} catch (InterruptedException e) {
+////				// TODO Auto-generated catch block
+////				e.printStackTrace();
+////			}
+//			
+//			gc ++;
+//			System.out.println("GARBAGE");
+//			System.gc();
+//		}
+
 		doEvent();
 	}
 	
 	public static void runProcess() {
 		// Decrease remaining time of process in the CPU
 		Process tempP = CPU.get(0);
-		int preclock = clock;
-		// Check if simulation is done before process is done running
+		long preclock = clock;
 		
+		// Check if simulation is done before process is done running
 		
 		if (tempP.remainingTime <= quantum) {
 			// Advance Clock by remaining time
@@ -246,7 +289,7 @@ public class Driver {
 		}
 		
 		cpuUtilization += (clock-preclock);
-		
+		//System.out.println("cpu:  " + cpuUtilization + " , clock:  " + clock);
 		//Create a Quantum Switch Event
 		Event switchEvent = new Event(2,clock);
 		eventQ.add(switchEvent);
@@ -254,16 +297,34 @@ public class Driver {
 	}
 	
 	public static void createProcess() {
-		Process p = new Process(clock,lastID,ioBoundPercentage);
-		readyQ.add(p);
+		System.out.println("Creating");
+		
+		Process p = new Process(clock,lastID,ioBoundPercentage,avgProcessLength);
+		
+		// If there are no others in the system, Move to CPU and Run
+		if (CPU.size() == 0 && readyQ.size() == 0) {
+			System.out.println("S'all empty");
+			readyQ.add(p);
+			
+			Event runProcess = new Event(4,clock);
+			Event movetocpu = new Event(1,clock);
+			
+			eventQ.add(movetocpu);
+			eventQ.add(runProcess);
+			//System.out.println("LAST ONE STANDING");
+		} else {
+			readyQ.add(p);
+		}
+		
 		lastID ++;
+		
 		
 		System.out.println("Created Process #" + p.id + " (Total Length: " + p.totalLength + ")" + "\t\t\t\t at time " + clock);
 		
 		// Create a new Create Process Event at a future time
 		
-		if (lastID < 1000) {
-			int futuretime = 100; // Random Number
+		if (lastID < 200) {
+			int futuretime =  Generator.randomRange(avgTimeBetweenProcesses); // Random Number
 			Event newProcess = new Event(0,clock + futuretime);
 			eventQ.add(newProcess);
 		}
@@ -275,10 +336,15 @@ public class Driver {
 		
 		avgTurnaround /= lastID;
 		avgWaiting /= lastID;
-		cpuUtilization = Math.round( (cpuUtilization / (float)(simulationTime)) * 100 );
 		
-		System.out.println("Avg. Turnaround Time: " + avgTurnaround);
-		System.out.println("Avg. Waiting Time: " + avgWaiting);
+		
+		
+		cpuUtilization = (long) ((float)((double)cpuUtilization/(double)simulationTime)*100);//Math.round( ((double)cpuUtilization / (double)(simulationTime)) * 100 );
+		
+		System.out.println("Total Simulation Time: " + (float)((float)clock/1000000.0) + "s");
+		System.out.println("Total Context Switch Time: " + (float)((float)totalContextSwitch/1000000.0) + "s");
+		System.out.println("Avg. Turnaround Time: " + (float)((float)avgTurnaround/1000000.0) + "s");
+		System.out.println("Avg. Waiting Time: " + (float)((float)avgWaiting/1000000.0) + "s");
 		System.out.println("CPU Utilization: " + cpuUtilization + "%");
 		System.out.println(doneCount + " Out Of " + lastID + " Processes Completed");
 	}	
