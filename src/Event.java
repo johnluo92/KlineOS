@@ -1,3 +1,5 @@
+// Scheduling Simulator
+// Barak Michaely , John Luo, Alvin Lawson
 
 public class Event implements Comparable<Event> {
 
